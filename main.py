@@ -69,11 +69,15 @@ class AppControl:
             self.config = cfg.load_config()
             self.monitor.set_interval(self.config["update_interval_ms"])
 
-    def on_metrics_updated(self, cpu, ram, disk):
-        self.dashboard.update_metrics(cpu, ram, disk, self.config)
+    def on_metrics_updated(self, stats):
+        self.dashboard.update_metrics(stats, self.config)
         
         if self.config["notifications_enabled"]:
             warnings = []
+            cpu = stats["cpu"]["percent"]
+            ram = stats["ram"]["percent"]
+            disk = stats["disk"]["percent"]
+            
             if cpu >= self.config["cpu_threshold"]:
                 warnings.append(f"CPU: {cpu:.1f}%")
             if ram >= self.config["ram_threshold"]:
