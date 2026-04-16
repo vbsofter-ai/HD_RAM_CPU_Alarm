@@ -51,7 +51,7 @@ class CircularProgress(QWidget):
 class Dashboard(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint | Qt.Tool)
+        self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnBottomHint | Qt.Tool)
         self.setAttribute(Qt.WA_TranslucentBackground)
         
         layout = QHBoxLayout()

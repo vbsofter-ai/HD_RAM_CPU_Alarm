@@ -1,0 +1,7 @@
+Package: hd-ram-cpu-alarm
+Version: 1.0
+Section: utils
+Priority: optional
+Architecture: amd64
+Maintainer: Developer
+Description: A professional CPU, RAM, and Disk monitor for Linux Mint
