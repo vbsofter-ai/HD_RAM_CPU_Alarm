@@ -12,13 +12,15 @@ class CircularProgress(QWidget):
         self.color = color
         self.used_str = ""
         self.free_str = ""
+        self.total_str = ""
         self.temp_str = "N/A"
-        self.setMinimumSize(100, 145) # Increased height for info labels
+        self.setMinimumSize(110, 160)
 
-    def set_data(self, val, used, free, temp):
+    def set_data(self, val, used, free, total, temp):
         self.value = val
         self.used_str = used
         self.free_str = free
+        self.total_str = total
         self.temp_str = temp
         self.update()
 
@@ -33,41 +35,44 @@ class CircularProgress(QWidget):
         rect = self.rect()
         width = rect.width()
         height = rect.height()
-        # The circle will occupy the top part
-        size = min(width, height - 55) - 10
+        
+        # Draw Circle
+        size = min(width, height - 70) - 10
         x = (width - size) / 2
         y = 5
 
-        # Draw background circle
-        painter.setPen(QPen(QColor(50, 50, 50), 8, Qt.SolidLine, Qt.RoundCap))
+        # Background Arc
+        painter.setPen(QPen(QColor(40, 40, 40), 7, Qt.SolidLine, Qt.RoundCap))
         painter.drawArc(int(x), int(y), int(size), int(size), 0, 360 * 16)
 
-        # Draw progress circle
-        painter.setPen(QPen(self.color, 8, Qt.SolidLine, Qt.RoundCap))
+        # Progress Arc
+        painter.setPen(QPen(self.color, 7, Qt.SolidLine, Qt.RoundCap))
         span_angle = int(-self.value * 3.6 * 16)
         painter.drawArc(int(x), int(y), int(size), int(size), 90 * 16, span_angle)
 
-        # Draw percentage in center
-        painter.setPen(QColor(220, 220, 220))
-        painter.setFont(QFont("Arial", 11, QFont.Bold))
+        # Percentage Text
+        painter.setPen(QColor(255, 255, 255))
+        painter.setFont(QFont("Segoe UI", 10, QFont.Bold))
         painter.drawText(int(x), int(y), int(size), int(size), Qt.AlignCenter, f"{self.value:.0f}%")
 
-        # Draw Title below circle
-        painter.setFont(QFont("Arial", 9, QFont.Bold))
+        # Title
+        painter.setFont(QFont("Segoe UI", 9, QFont.Bold))
         painter.setPen(self.color)
-        painter.drawText(0, int(y + size + 2), width, 15, Qt.AlignCenter, self.title)
+        painter.drawText(0, int(y + size + 4), width, 16, Qt.AlignCenter, self.title)
 
-        # Draw labels
-        painter.setFont(QFont("Arial", 8))
+        # Details
+        painter.setFont(QFont("Segoe UI", 7))
+        painter.setPen(QColor(200, 200, 200))
         
-        # Labels center-aligned
-        painter.setPen(QColor(180, 180, 180))
-        painter.drawText(0, int(y + size + 18), width, 12, Qt.AlignCenter, f"المستخدم: {self.used_str}")
-        painter.drawText(0, int(y + size + 30), width, 12, Qt.AlignCenter, f"المحرر: {self.free_str}")
+        offset = int(y + size + 22)
+        painter.drawText(0, offset, width, 12, Qt.AlignCenter, f"المستخدم: {self.used_str}")
+        painter.drawText(0, offset + 12, width, 12, Qt.AlignCenter, f"المتاح: {self.free_str}")
+        painter.drawText(0, offset + 24, width, 12, Qt.AlignCenter, f"الإجمالي: {self.total_str}")
         
-        # Temperature in a slightly different color
-        painter.setPen(QColor("#ff7f50")) # Radiant Coral/Orange for thermal
-        painter.drawText(0, int(y + size + 42), width, 12, Qt.AlignCenter, f"الحرارة: {self.temp_str}")
+        # Temp
+        painter.setPen(QColor("#FFA500") if self.temp_str != "N/A" else QColor(100, 100, 100))
+        painter.setFont(QFont("Segoe UI", 8, QFont.Bold))
+        painter.drawText(0, offset + 38, width, 14, Qt.AlignCenter, f"🌡 {self.temp_str}")
 
 
 class Dashboard(QWidget):
@@ -95,7 +100,7 @@ class Dashboard(QWidget):
         self.bg_layout.addWidget(self.disk_progress)
         
         main_layout.addWidget(self.bg_widget)
-        self.resize(340, 175) # Increased height
+        self.resize(360, 200) # Increased height and width
         
     def update_metrics(self, stats, config):
         self._update_widget(self.cpu_progress, stats["cpu"], config["cpu_threshold"])
@@ -104,7 +109,7 @@ class Dashboard(QWidget):
 
     def _update_widget(self, widget, data, threshold):
         value = data["percent"]
-        widget.set_data(value, data["used"], data["free"], data["temp"])
+        widget.set_data(value, data["used"], data["free"], data.get("total", "N/A"), data["temp"])
         
         if value >= threshold:
             widget.set_color(QColor("#ff4444")) # Red

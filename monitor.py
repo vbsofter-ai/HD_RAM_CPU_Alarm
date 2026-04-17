@@ -25,35 +25,53 @@ class SystemMonitor(QObject):
         ram_data = psutil.virtual_memory()
         
         # Disk
-        disk_data = psutil.disk_usage('/')
+        disk_path = getattr(self, 'disk_path', '/')
+        try:
+            disk_data = psutil.disk_usage(disk_path)
+        except:
+            disk_data = psutil.disk_usage('/')
         
         # Temperatures
         temps = psutil.sensors_temperatures()
         cpu_temp = "N/A"
         ram_temp = "N/A"
-        disk_temp = "N/A" # Default
+        disk_temp = "N/A"
 
-        # Try to get CPU temp
-        if 'coretemp' in temps and temps['coretemp']:
-            cpu_temp = f"{temps['coretemp'][0].current:.1f}°C"
-        elif 'dell_ddv' in temps: # Fallback for Dell
-            for t in temps['dell_ddv']:
-                if t.label == 'CPU':
-                    cpu_temp = f"{t.current:.1f}°C"
+        # Improved logic for CPU temp
+        for name, entries in temps.items():
+            name_l = name.lower()
+            if any(k in name_l for k in ['coretemp', 'cpu', 'pkg', 'soc', 'dell_ddv']):
+                for entry in entries:
+                    label_l = entry.label.lower()
+                    if any(k in label_l for k in ['package', 'id 0', 'die', 'avg', 'cpu']) or not entry.label:
+                        cpu_temp = f"{entry.current:.0f}°C"
+                        break
+                if cpu_temp != "N/A": break
+        
+        # Improved logic for RAM temp
+        for name, entries in temps.items():
+            for entry in entries:
+                label_l = entry.label.lower()
+                if any(k in label_l for k in ['sodimm', 'ram', 'dimm', 'mem']):
+                    ram_temp = f"{entry.current:.0f}°C"
                     break
+            if ram_temp != "N/A": break
 
-        # Try to get RAM temp (Specific for Dell SODIMM)
-        if 'dell_ddv' in temps:
-            for t in temps['dell_ddv']:
-                if t.label == 'SODIMM':
-                    ram_temp = f"{t.current:.1f}°C"
+        # Improved logic for Disk temp
+        for name, entries in temps.items():
+            name_l = name.lower()
+            if any(k in name_l for k in ['nvme', 'ssd', 'disk', 'sata']):
+                for entry in entries:
+                    disk_temp = f"{entry.current:.0f}°C"
                     break
+            if disk_temp != "N/A": break
 
         stats = {
             "cpu": {
                 "percent": cpu_used,
-                "used": f"{cpu_used:.1f}%",
-                "free": f"{100-cpu_used:.1f}%",
+                "used": f"{cpu_used:.0f}%",
+                "free": f"{100-cpu_used:.0f}%",
+                "total": f"{psutil.cpu_count()} Cores",
                 "temp": cpu_temp
             },
             "ram": {

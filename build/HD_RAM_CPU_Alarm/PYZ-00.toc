@@ -66,6 +66,7 @@
   ('fnmatch', '/usr/lib/python3.12/fnmatch.py', 'PYMODULE'),
   ('fractions', '/usr/lib/python3.12/fractions.py', 'PYMODULE'),
   ('getopt', '/usr/lib/python3.12/getopt.py', 'PYMODULE'),
+  ('getpass', '/usr/lib/python3.12/getpass.py', 'PYMODULE'),
   ('gettext', '/usr/lib/python3.12/gettext.py', 'PYMODULE'),
   ('glob', '/usr/lib/python3.12/glob.py', 'PYMODULE'),
   ('gzip', '/usr/lib/python3.12/gzip.py', 'PYMODULE'),

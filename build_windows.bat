@@ -1,23 +1,29 @@
 @echo off
-echo ==========================================
-echo System Resource Alarm - Windows Build Tool
-echo ==========================================
+set APP_NAME=HD_RAM_CPU_Alarm
+set VERSION=1.1
+echo ==================================================
+echo %APP_NAME% v%VERSION% - Windows Build Tool
+echo ==================================================
 
 REM Check if Python is installed
 python --version >nul 2>&1
 if %errorlevel% neq 0 (
     echo [ERROR] Python is not installed or not added to PATH!
-    echo Please install Python 3 from python.org and check "Add Python to PATH".
     pause
     exit /b
 )
 
-echo [INFO] Installing required libraries...
-pip install PyQt5 psutil pyinstaller
+echo [INFO] Updating dependencies...
+pip install PyQt5 psutil pyinstaller --upgrade
 
-echo [INFO] Building the executable...
-pyinstaller --noconfirm --onefile --windowed --name "HD_RAM_CPU_Alarm_Win" main.py
+echo [INFO] Building standalone executable...
+pyinstaller --noconfirm --onefile --windowed --name "%APP_NAME%_v%VERSION%" --icon="NONE" main.py
 
 echo [SUCCESS] Build finished! 
-echo Check the "dist" folder for HD_RAM_CPU_Alarm_Win.exe.
+echo --------------------------------------------------
+echo The executable is in the "dist" folder.
+echo To create a professional installer (MSI/EXE), 
+echo it is recommended to use "Inno Setup" or "NSIS" 
+echo with the generated .exe file.
+echo --------------------------------------------------
 pause

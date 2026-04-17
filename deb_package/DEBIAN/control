@@ -1,7 +1,8 @@
 Package: hd-ram-cpu-alarm
-Version: 1.0
+Version: 1.1
 Section: utils
 Priority: optional
 Architecture: amd64
-Maintainer: Developer
-Description: A professional CPU, RAM, and Disk monitor for Linux Mint
+Maintainer: Atef Ment <atef@example.com>
+Description: A professional CPU, RAM, and Disk monitor with Temperature tracking.
+ Professional dashboard for real-time system monitoring.
